@@ -16,10 +16,10 @@ app.use(express.urlencoded({ extended: true }));
 connectDB();
 
 // Health check
-app.get("/", (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({
     success: true,
-    message: "Certificate Automation API is running",
+    message: "healthy",
   });
 });
 
