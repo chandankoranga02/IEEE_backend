@@ -1,0 +1,41 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.production
+.env.*.local
+
+# Dependencies
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Runtime files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Temporary files
+tmp/
+temp/
+
+# Generated certificates
+certificates/
+generated-certificates/
+
+# Puppeteer / Chrome cache
+.puppeteer/
+
+# Build / coverage
+dist/
+build/
+coverage/
