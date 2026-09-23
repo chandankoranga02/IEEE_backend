@@ -4,6 +4,9 @@ import cors from "cors";
 import connectDB from "./src/config/mongodb.js";
 
 import CertificateRoute from "./src/modules/certificate/router.js";
+import AuthRouter from "./src/modules/auth/auth.router.js";
+
+
 
 const app = express();
 
@@ -23,7 +26,8 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/api/v1/certificate", CertificateRoute)
+app.use("/api/v1/certificate", CertificateRoute);
+app.use("/api/v1/auth", AuthRouter);
 
 // Port
 const PORT = process.env.PORT || 5000;
