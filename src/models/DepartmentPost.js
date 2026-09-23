@@ -9,6 +9,12 @@ const Departmentpost = new mongoose.Schema(
       index: true,
     },
 
+    postId : {
+       required : true,
+       unique : true,
+       index : true,
+    },
+
     title: {
       type: String,
       required: true,
