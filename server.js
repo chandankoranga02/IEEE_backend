@@ -5,7 +5,7 @@ import connectDB from "./src/config/mongodb.js";
 
 import CertificateRoute from "./src/modules/certificate/router.js";
 import AuthRouter from "./src/modules/auth/auth.router.js";
-
+import DepartmentRouter from "./src/modules/department/dep.router.js"
 
 
 const app = express();
@@ -20,14 +20,13 @@ connectDB();
 
 // Health check
 app.get("/health", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "healthy",
-  });
+  res.status(200).json({ success: true, message: "healthy"});
 });
+
 
 app.use("/api/v1/certificate", CertificateRoute);
 app.use("/api/v1/auth", AuthRouter);
+app.use("/api/v1/department, DepartmentRouter");
 
 // Port
 const PORT = process.env.PORT || 5000;
