@@ -14,10 +14,10 @@ const certificateSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
- 
-    branch : {
-      type : String,
-      required :  true,
+
+    branch: {
+      type: String,
+      required: true,
     },
 
     eventName: {
@@ -25,10 +25,28 @@ const certificateSchema = new mongoose.Schema(
       required: true,
     },
 
+    date: {
+      type: String,
+      required: true,
+    },
+
+    position: {
+      type: String,
+      enum: ["1st", "2nd", "3rd"],
+      required: false,
+      default: null,
+    },
+
     certificateId: {
       type: String,
       required: true,
       unique: true,
+    },
+
+    status: {
+      type: String,
+      enum: ["pending", "approved", "rejected"],
+      default: "pending",
     },
   },
   {
