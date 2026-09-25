@@ -32,4 +32,4 @@ const departmentPostsService = async () => {
   return counts;
 };
 
- export default { departmentPostsService };
+ export default departmentPostsService ;

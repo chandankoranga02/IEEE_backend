@@ -23,4 +23,4 @@ const contactUsService = async () => {
   return counts;
 };
 
-export default { contactUsService };
+export default contactUsService ;

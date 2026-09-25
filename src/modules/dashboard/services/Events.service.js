@@ -9,4 +9,4 @@ const eventsService = async () => {
   return events;
 };
 
-export default { eventsService };
+export default  eventsService ;

@@ -23,4 +23,4 @@ const certificatesService = async () => {
   return counts;
 };
 
-export default { certificatesService};
+export default certificatesService;
