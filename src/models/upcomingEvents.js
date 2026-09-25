@@ -37,14 +37,23 @@ const UpcomingeventSchema = new mongoose.Schema(
       trim: true,
     },
 
-    imageUrl: {
-      type: String,
-      default: null,
+    image: {
+      url: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+
+      publicId: {
+        type: String,
+        default: "",
+        trim: true,
+      },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Event = mongoose.model("UpcomingEvent", UpcomingeventSchema);
