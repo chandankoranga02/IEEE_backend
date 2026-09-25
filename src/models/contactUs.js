@@ -34,14 +34,9 @@ const ticketSchema = new mongoose.Schema(
       trim: true,
     },
 
-    attachment: {
-      type: String,
-      default: null,
-    },
-
     solvedStatus: {
       type: String,
-      enum: ["pending", "in-progress", "solved", "closed"],
+      enum: ["pending", "rejected", "solved"],
       default: "pending",
       index: true,
     },
