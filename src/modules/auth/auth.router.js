@@ -1,11 +1,12 @@
 import express from "express";
 import { Login , Logout } from "./auth.controller.js";
 import { GenerateResetOtp , VerifyResetOtp , ResetPassword} from "./otp.controller.js"
+import { loginLimiter } from "../../middleware/ratelimiter.js"
 
 const router = express.Router();
 
 // 
-router.post("/login", Login);
+router.post("/login", loginLimiter , Login);
 router.post("/logout", Logout);
 
 // OTP Apis
