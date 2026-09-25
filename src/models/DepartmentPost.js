@@ -9,10 +9,11 @@ const Departmentpost = new mongoose.Schema(
       index: true,
     },
 
-    postId : {
-       required : true,
-       unique : true,
-       index : true,
+    postId: {
+      type: String,
+      required: true,
+      unique: true,
+      index: true,
     },
 
     title: {
@@ -87,16 +88,27 @@ const Departmentpost = new mongoose.Schema(
     },
 
     image: {
-      type: String,
-      default: "",
-      trim: true,
+      url: {
+        type: String,
+        default: "",
+        trim: true,
+      },
+
+      publicId: {
+        type: String,
+        default: "",
+        trim: true,
+      },
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
-const Activity = mongoose.model("DepartmetnPost", Departmentpost);
+const DepartmentPost = mongoose.model(
+  "DepartmentPost",
+  Departmentpost,
+);
 
-export default Activity;
+export default DepartmentPost;
