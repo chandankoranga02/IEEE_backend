@@ -8,4 +8,5 @@ const viewTicketService = async (id) => {
   return ticket;
 };
 
-export default { viewTicketService };
+export { viewTicketService };
+export default viewTicketService;

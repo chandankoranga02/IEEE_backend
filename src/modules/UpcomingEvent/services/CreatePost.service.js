@@ -1,5 +1,5 @@
 import Event from "../../../models/upcomingEvents.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { uploadToCloudinary } from "../../../config/cloudinary.js";
 import generatePostId from "../../../utils/EventsIDgenerator.js";
 
 const createPostService = async ({
@@ -13,7 +13,6 @@ const createPostService = async ({
   let postId;
   let attempts = 0;
   const MAX_ATTEMPTS = 10;
-
 
   while (attempts < MAX_ATTEMPTS) {
     const generatedId = generatePostId();
@@ -34,21 +33,16 @@ const createPostService = async ({
     throw new Error("Unable to generate a unique post ID");
   }
 
-
   let imageData = {
     url: "",
     publicId: "",
   };
 
   if (image) {
-    const result = await cloudinary.uploader.upload(image.path, {
-      folder: "ieee-upcoming-events",
-    });
-
-    imageData = {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
+    const uploaded = await uploadToCloudinary(image, "ieee-upcoming-events");
+    if (uploaded && uploaded.url) {
+      imageData = uploaded;
+    }
   }
 
 

@@ -6,13 +6,15 @@ import {
   editPost,
   deletePost,
 } from "./dep.controller.js";
+import verifyToken from "../../middleware/auth.middleware.js";
+import { uploadSingleImage } from "../../config/multer.js";
 
 const router = express.Router();
 
-router.post("/create", createPost);
+router.post("/create", verifyToken, uploadSingleImage("image"), createPost);
 router.get("/all", allPost);
-router.delete("/delete/:id", deletePost);
-router.patch("/edit/:id", editPost);
+router.delete("/delete/:id", verifyToken, deletePost);
+router.patch("/edit/:id", verifyToken, uploadSingleImage("image"), editPost);
 router.get("/post/:id", viewPost);
 
 export default router;

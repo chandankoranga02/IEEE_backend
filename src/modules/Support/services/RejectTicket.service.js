@@ -15,4 +15,5 @@ const rejectTicketService = async (id) => {
   return ticket;
 };
 
-export default { rejectTicketService };
+export { rejectTicketService };
+export default rejectTicketService;

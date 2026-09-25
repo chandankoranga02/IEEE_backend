@@ -5,4 +5,5 @@ const getAllTicketsService = async () => {
   return tickets;
 };
 
-export default { getAllTicketsService };
+export { getAllTicketsService };
+export default getAllTicketsService;

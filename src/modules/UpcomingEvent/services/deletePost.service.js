@@ -1,5 +1,5 @@
 import Event from "../../../models/upcomingEvents.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { deleteFromCloudinary } from "../../../config/cloudinary.js";
 
 const deletePostService = async (id) => {
   const post = await Event.findOne({
@@ -12,7 +12,7 @@ const deletePostService = async (id) => {
 
   // Delete image from Cloudinary
   if (post.image?.publicId) {
-    await cloudinary.uploader.destroy(post.image.publicId);
+    await deleteFromCloudinary(post.image.publicId);
   }
 
   // Delete event from database

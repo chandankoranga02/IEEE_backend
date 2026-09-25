@@ -32,4 +32,5 @@ const sendMessageService = async (
   return ticket;
 };
 
-export default { sendMessageService };
+export { sendMessageService };
+export default sendMessageService;

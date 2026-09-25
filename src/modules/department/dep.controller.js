@@ -4,6 +4,27 @@ import { editPostService } from "./services/EditPost.service.js";
 import { getAllPostsService } from "./services/getAllPosts.service.js";
 import { viewPostService } from "./services/ViewPost.service.js";
 
+const parseArrayField = (field) => {
+  if (!field) return [];
+  if (Array.isArray(field)) return field;
+  if (typeof field === "string") {
+    const trimmed = field.trim();
+    if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (Array.isArray(parsed)) return parsed.map((s) => String(s).trim());
+      } catch (e) {
+        // fallback
+      }
+    }
+    return trimmed
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  return [];
+};
+
 const createPost = async (req, res) => {
   try {
     const image = req.file;
@@ -19,7 +40,7 @@ const createPost = async (req, res) => {
       description,
       keyDiscussion,
       studentsPresent,
-      
+      branch,
     } = req.body;
 
     const { dep } = req.query;
@@ -34,10 +55,10 @@ const createPost = async (req, res) => {
       reportAuthor,
       overview,
       description,
-      keyDiscussion,
-      studentsPresent,
+      keyDiscussion: parseArrayField(keyDiscussion),
+      studentsPresent: parseArrayField(studentsPresent),
       image,
-      branch: dep,
+      branch: dep || branch,
     });
 
     return res.status(201).json({
@@ -125,8 +146,8 @@ const editPost = async (req, res) => {
       reportAuthor,
       overview,
       description,
-      keyDiscussion,
-      studentsPresent,
+      keyDiscussion !== undefined ? parseArrayField(keyDiscussion) : undefined,
+      studentsPresent !== undefined ? parseArrayField(studentsPresent) : undefined,
       image,
     );
 

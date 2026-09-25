@@ -1,5 +1,5 @@
 import DepartmentPost from "../../../models/DepartmentPost.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../../config/cloudinary.js";
 
 const editPostService = async (
   id,
@@ -24,36 +24,32 @@ const editPostService = async (
     throw new Error("Post not found");
   }
 
- 
   if (image) {
-  
     if (post.image?.publicId) {
-      await cloudinary.uploader.destroy(post.image.publicId);
+      await deleteFromCloudinary(post.image.publicId);
     }
 
-    // Upload new image
-    const result = await cloudinary.uploader.upload(image.path, {
-      folder: "ieee-department-posts",
-    });
-
-    post.image = {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
+    const uploaded = await uploadToCloudinary(image, "ieee-department-posts");
+    if (uploaded && uploaded.url) {
+      post.image = {
+        url: uploaded.url,
+        publicId: uploaded.publicId,
+      };
+    }
   }
 
   // Update post fields
-  post.title = title;
-  post.category = category;
-  post.date = date;
-  post.time = time;
-  post.venue = venue;
-  post.organizedBy = organizedBy;
-  post.reportAuthor = reportAuthor;
-  post.overview = overview;
-  post.description = description;
-  post.keyDiscussion = keyDiscussion;
-  post.studentsPresent = studentsPresent;
+  if (title !== undefined) post.title = title;
+  if (category !== undefined) post.category = category;
+  if (date !== undefined) post.date = date;
+  if (time !== undefined) post.time = time;
+  if (venue !== undefined) post.venue = venue;
+  if (organizedBy !== undefined) post.organizedBy = organizedBy;
+  if (reportAuthor !== undefined) post.reportAuthor = reportAuthor;
+  if (overview !== undefined) post.overview = overview;
+  if (description !== undefined) post.description = description;
+  if (keyDiscussion !== undefined) post.keyDiscussion = keyDiscussion;
+  if (studentsPresent !== undefined) post.studentsPresent = studentsPresent;
 
   await post.save();
 

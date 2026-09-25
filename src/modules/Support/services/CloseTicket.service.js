@@ -15,4 +15,5 @@ const closeTicketService = async (id) => {
   return ticket;
 };
 
-export default { closeTicketService };
+export { closeTicketService };
+export default closeTicketService;

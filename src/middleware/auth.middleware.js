@@ -1,17 +1,24 @@
-import JwtVerify from "../utils/JwtVerify.js";
+import JwtVerify from "../utils/jwt.verify.js";
 
 const verifyToken = (req, res, next) => {
   try {
+    let token = null;
     const authHeader = req.headers.authorization;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      token = authHeader.split(" ")[1];
+    } else if (req.headers["x-access-token"]) {
+      token = req.headers["x-access-token"];
+    } else if (req.cookies && req.cookies.Token) {
+      token = req.cookies.Token;
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
         message: "Access denied. No token provided.",
       });
     }
-
-    const token = authHeader.split(" ")[1];
 
     const decoded = JwtVerify(token);
 

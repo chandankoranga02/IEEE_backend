@@ -1,7 +1,7 @@
 import resend from "../config/resend.js";
 import emailCertificate from "../templates/emailtemplate.js";
 
-const SENDER_EMAIL ="IEEE GBPIET <noreply@appnests.in>";
+const SENDER_EMAIL = process.env.EMAIL_FROM || "IEEE GBPIET <noreply@appnests.in>";
 
 /**
  * Sends a certificate PDF to the recipient via Resend.

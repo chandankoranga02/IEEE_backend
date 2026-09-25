@@ -1,5 +1,5 @@
 import DepartmentPost from "../../../models/DepartmentPost.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { uploadToCloudinary } from "../../../config/cloudinary.js";
 import generatePostId from "../../../utils/GeneratePostId.js";
 
 const createPostService = async ({
@@ -43,14 +43,10 @@ const createPostService = async ({
   let imageData = { url: "", publicId: "" };
 
   if (image) {
-    const result = await cloudinary.uploader.upload(image.path, {
-      folder: "ieee-department-posts",
-    });
-
-    imageData = {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
+    const uploaded = await uploadToCloudinary(image, "ieee-department-posts");
+    if (uploaded && uploaded.url) {
+      imageData = uploaded;
+    }
   }
 
   const post = await DepartmentPost.create({

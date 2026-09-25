@@ -1,5 +1,5 @@
 import Event from "../../../models/upcomingEvents.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { uploadToCloudinary, deleteFromCloudinary } from "../../../config/cloudinary.js";
 
 const editPostService = async (
   id,
@@ -19,27 +19,25 @@ const editPostService = async (
   }
 
   if (image) {
-
     if (post.image?.publicId) {
-      await cloudinary.uploader.destroy(post.image.publicId);
+      await deleteFromCloudinary(post.image.publicId);
     }
-  
-    const result = await cloudinary.uploader.upload(image.path, {
-      folder: "ieee-upcoming-events",
-    });
 
-    post.image = {
-      url: result.secure_url,
-      publicId: result.public_id,
-    };
+    const uploaded = await uploadToCloudinary(image, "ieee-upcoming-events");
+    if (uploaded && uploaded.url) {
+      post.image = {
+        url: uploaded.url,
+        publicId: uploaded.publicId,
+      };
+    }
   }
 
 
-  post.eventName = eventName;
-  post.title = title;
-  post.date = date;
-  post.lastDate = lastDate;
-  post.overview = overview;
+  if (eventName !== undefined) post.eventName = eventName;
+  if (title !== undefined) post.title = title;
+  if (date !== undefined) post.date = date;
+  if (lastDate !== undefined) post.lastDate = lastDate;
+  if (overview !== undefined) post.overview = overview;
 
   await post.save();
 

@@ -1,5 +1,5 @@
 import DepartmentPost from "../../../models/DepartmentPost.js";
-import cloudinary from "../../../config/cloudinary.js";
+import { deleteFromCloudinary } from "../../../config/cloudinary.js";
 
 const deletePostService = async (id) => {
   const post = await DepartmentPost.findOne({
@@ -12,7 +12,7 @@ const deletePostService = async (id) => {
 
 
   if (post.image?.publicId) {
-    await cloudinary.uploader.destroy(post.image.publicId);
+    await deleteFromCloudinary(post.image.publicId);
   }
 
 
