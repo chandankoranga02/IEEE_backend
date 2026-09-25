@@ -17,7 +17,6 @@ const createPostService = async ({
   image,
   branch,
 }) => {
-
   let postId;
   let attempts = 0;
   const MAX_ATTEMPTS = 10;
@@ -42,7 +41,6 @@ const createPostService = async ({
   }
 
   let imageData = { url: "", publicId: "" };
-
 
   if (image) {
     const result = await cloudinary.uploader.upload(image.path, {
