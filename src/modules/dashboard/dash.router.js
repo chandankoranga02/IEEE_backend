@@ -9,7 +9,7 @@ import verifyToken from "../../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-// All dashboard endpoints require authentication
+
 router.use(verifyToken);
 
 router.get("/departmentposts/getall", departmentposts);

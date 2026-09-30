@@ -36,4 +36,5 @@ const LoginService = async (email, password) => {
   };
 };
 
+
 export default LoginService;

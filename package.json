@@ -6,7 +6,8 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon"
+    "dev": "nodemon",
+    "build": "echo Build completed"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -1,5 +1,5 @@
 import express from "express";
-import { Login , Logout } from "./auth.controller.js";
+import { Login , Logout , signup } from "./auth.controller.js";
 import { GenerateResetOtp , VerifyResetOtp , ResetPassword} from "./otp.controller.js"
 import { loginLimiter } from "../../middleware/ratelimiter.js"
 
@@ -8,6 +8,7 @@ const router = express.Router();
 // 
 router.post("/login", loginLimiter , Login);
 router.post("/logout", Logout);
+router.post("/singup", signup);
 
 // OTP Apis
 router.post("/resetPassword/otp/verifyOtp" , VerifyResetOtp);

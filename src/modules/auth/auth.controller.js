@@ -1,8 +1,16 @@
 import LoginService from "./services/Login.service.js";
+import SingupService from "./services/Singup.service.js";
 
 const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
 
     const { user, token } = await LoginService(email, password);
 
@@ -14,9 +22,9 @@ const Login = async (req, res) => {
     });
 
     return res.status(200).json({
-      msg: "Login Successfull",
       success: true,
-      user: user,
+      message: "Login successful",
+      user,
       token,
     });
   } catch (error) {
@@ -47,6 +55,32 @@ const Logout = async (req, res) => {
   }
 };
 
-export { Login, Logout };
-export default { Login, Logout };
+const signup = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
+
+    const result = await SingupService(email, password);
+
+    return res.status(201).json({
+      success: true,
+      message: "Signup successful",
+      data: result,
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error instanceof Error
+        ? error.message
+        : "Signup failed",
+    });
+  }
+};
+
+export { Login, Logout, signup };
