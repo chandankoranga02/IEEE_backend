@@ -9,4 +9,5 @@ const generatePostId = () => {
   return `IEEE${month}${date}${number}`;
 };
 
-export default { generatePostId };
+export { generatePostId };
+export default generatePostId;

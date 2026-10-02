@@ -11,7 +11,7 @@ import { uploadSingleImage } from "../../config/multer.js";
 
 const router = express.Router();
 
-router.post("/create", verifyToken, uploadSingleImage("image"), createPost);
+router.post("/create",verifyToken,  uploadSingleImage("image"), createPost);
 router.get("/all", allPost);
 router.delete("/delete/:id", verifyToken, deletePost);
 router.patch("/edit/:id", verifyToken, uploadSingleImage("image"), editPost);

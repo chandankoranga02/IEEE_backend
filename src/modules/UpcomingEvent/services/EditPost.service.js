@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import Event from "../../../models/upcomingEvents.js";
 import { uploadToCloudinary, deleteFromCloudinary } from "../../../config/cloudinary.js";
 
@@ -10,9 +11,11 @@ const editPostService = async (
   overview,
   image,
 ) => {
-  const post = await Event.findOne({
-    postId: id,
-  });
+  const filter = mongoose.isValidObjectId(id)
+    ? { $or: [{ postId: id }, { _id: id }] }
+    : { postId: id };
+
+  const post = await Event.findOne(filter);
 
   if (!post) {
     throw new Error("Event not found");

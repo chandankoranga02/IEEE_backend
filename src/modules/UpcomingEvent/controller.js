@@ -29,7 +29,7 @@ const createPost = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to create event",
+      message: error.message || "Failed to create event",
     });
   }
 };
@@ -48,7 +48,7 @@ const allPost = async (req, res) => {
 
     return res.status(500).json({
       success: false,
-      message: "Failed to fetch events",
+      message: error.message || "Failed to fetch events",
     });
   }
 };
@@ -65,10 +65,11 @@ const viewPost = async (req, res) => {
     });
   } catch (error) {
     console.error("View event error:", error);
+    const statusCode = error.message === "Event not found" ? 404 : 500;
 
-    return res.status(500).json({
+    return res.status(statusCode).json({
       success: false,
-      message: "Failed to fetch event",
+      message: error.message || "Failed to fetch event",
     });
   }
 };
@@ -98,10 +99,11 @@ const editPost = async (req, res) => {
     });
   } catch (error) {
     console.error("Edit event error:", error);
+    const statusCode = error.message === "Event not found" ? 404 : 500;
 
-    return res.status(500).json({
+    return res.status(statusCode).json({
       success: false,
-      message: "Failed to update event",
+      message: error.message || "Failed to update event",
     });
   }
 };
@@ -118,10 +120,11 @@ const deletePost = async (req, res) => {
     });
   } catch (error) {
     console.error("Delete event error:", error);
+    const statusCode = error.message === "Event not found" ? 404 : 500;
 
-    return res.status(500).json({
+    return res.status(statusCode).json({
       success: false,
-      message: "Failed to delete event",
+      message: error.message || "Failed to delete event",
     });
   }
 };

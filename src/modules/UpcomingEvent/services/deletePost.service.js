@@ -1,10 +1,13 @@
+import mongoose from "mongoose";
 import Event from "../../../models/upcomingEvents.js";
 import { deleteFromCloudinary } from "../../../config/cloudinary.js";
 
 const deletePostService = async (id) => {
-  const post = await Event.findOne({
-    postId: id,
-  });
+  const filter = mongoose.isValidObjectId(id)
+    ? { $or: [{ postId: id }, { _id: id }] }
+    : { postId: id };
+
+  const post = await Event.findOne(filter);
 
   if (!post) {
     throw new Error("Event not found");
@@ -17,7 +20,7 @@ const deletePostService = async (id) => {
 
   // Delete event from database
   await Event.deleteOne({
-    postId: id,
+    _id: post._id,
   });
 
   return post;
