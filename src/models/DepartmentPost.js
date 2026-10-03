@@ -2,13 +2,6 @@ import mongoose from "mongoose";
 
 const Departmentpost = new mongoose.Schema(
   {
-    id: {
-      type: String,
-      required: true,
-      unique: true,
-      index: true,
-    },
-
     postId: {
       type: String,
       required: true,
