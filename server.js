@@ -9,6 +9,7 @@ import DepartmentRouter from "./src/modules/department/dep.router.js";
 import UpcomingEventRouter from "./src/modules/UpcomingEvent/router.js"
 import SupportRouter from "./src/modules/Support/support.router.js"
 import DashBoardRouter from "./src/modules/dashboard/dash.router.js"
+import RegisterRouter from "./src/modules/Registration/register.router.js"
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ success: true, message: "healthy"});
 });
 
+
 // Central Routes 
 app.use("/api/v1/certificate", CertificateRoute);
 app.use("/api/v1/auth", AuthRouter);
@@ -32,6 +34,7 @@ app.use("/api/v1/department", DepartmentRouter);
 app.use("/api/v1/upcomingevents", UpcomingEventRouter);
 app.use("/api/v1/support", SupportRouter);
 app.use("/api/v1/dashboard", DashBoardRouter);
+app.use("/api/v1/registration" , RegisterRouter);
 
 
 // Port
