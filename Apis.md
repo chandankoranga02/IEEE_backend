@@ -7,10 +7,10 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 ## 📊 Summary of APIs
 
 ### 1. Global Metrics
-- **Total APIs Count**: `30`
-- **Total Modules**: `7`
+- **Total APIs Count**: `33`
+- **Total Modules**: `8`
 - **Protected APIs (Require JWT Auth)**: `17`
-- **Public APIs**: `13`
+- **Public APIs**: `16`
 
 ### 2. Module-wise Breakdown
 
@@ -23,7 +23,8 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 | **Upcoming Events** | `/api/v1/upcomingevents` | 5 | 2 | 3 |
 | **Support & Tickets** | `/api/v1/support` | 5 | 1 | 4 |
 | **Dashboard Analytics** | `/api/v1/dashboard` | 4 | 0 | 4 |
-| **Total** | | **30** | **13** | **17** |
+| **Registration** | `/api/v1/registration` | 3 | 3 | 0 |
+| **Total** | | **33** | **16** | **17** |
 
 ---
 
@@ -61,6 +62,9 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 | 28 | Dashboard | `GET` | `/api/v1/dashboard/events/getall` | **Yes (Bearer)** | None | Top 3 upcoming events for dashboard widget |
 | 29 | Dashboard | `GET` | `/api/v1/dashboard/contactus/getall` | **Yes (Bearer)** | None | Ticket counts grouped by solvedStatus |
 | 30 | Dashboard | `GET` | `/api/v1/dashboard/certificates/getall` | **Yes (Bearer)** | None | Certificate counts grouped by status |
+| 31 | Registration | `POST` | `/api/v1/registration/new` | No | `application/json` | Participant or team event registration & certificate provisioning |
+| 32 | Registration | `GET` | `/api/v1/registration/getInfo/:registrationId` | No | None | Retrieves registration details by 7-digit `registrationId` |
+| 33 | Registration | `GET` | `/api/v1/registration/getAll` | No | None | Retrieves all event registrations sorted by newest first |
 
 ---
 
@@ -948,3 +952,343 @@ Aggregates certificate metrics grouped by application status (`pending`, `approv
   }
 }
 ```
+
+---
+
+### 8. Registration Module (`/api/v1/registration`)
+
+Manages participant event registrations (supporting both `INDIVIDUAL` and `TEAM` formats) and automatically initializes pending certificate entries for all registered members.
+
+#### `POST /api/v1/registration/new`
+Registers an individual participant or a multi-member team for an IEEE event. Upon successful validation, generates a unique 7-digit `registrationId` and automatically provisions pending certificates with unique certificate IDs in the `certificate` collection for all member participants.
+
+- **Authentication**: None (Public)
+- **Headers**: `Content-Type: application/json`
+- **Query Parameters**:
+  - `mode` *(string, required)*: Registration format. Allowed values: `INDIVIDUAL` or `TEAM` (case-insensitive).
+    - Example: `POST /api/v1/registration/new?mode=INDIVIDUAL`
+    - Example: `POST /api/v1/registration/new?mode=TEAM`
+- **Validation Rules**:
+  - `eventName`: Required non-empty string.
+  - `date`: Required event date string.
+  - `mode`: Must be either `INDIVIDUAL` or `TEAM`.
+  - `members`: Required array of member objects.
+  - **If `mode=INDIVIDUAL`**:
+    - `members` array must contain **exactly 1** member object.
+    - `teamName` must NOT be provided (must be omitted or empty).
+  - **If `mode=TEAM`**:
+    - `members` array must contain **at least 2** member objects.
+    - `teamName` is **required** and must not already be registered for the specified event (returns `409 Conflict` on duplicate).
+  - **Member Object Schema**:
+    - `instituteId` *(string, required)*: Student institute registration / roll number.
+    - `name` *(string, required)*: Participant full name.
+    - `phone` *(string, required)*: Contact phone number.
+    - `email` *(string, required)*: Valid email address.
+    - `year` *(number, required)*: Academic year (`1`, `2`, `3`, or `4`).
+    - `branch` *(string, required)*: Engineering branch / department (`CSE`, `AIML`, `ECE`, etc.).
+
+##### Request Example 1: Individual Registration
+- **Endpoint**: `POST /api/v1/registration/new?mode=INDIVIDUAL`
+- **Request Body**:
+```json
+{
+  "eventName": "IEEE Web Development Bootcamp 2026",
+  "date": "2026-04-15",
+  "members": [
+    {
+      "instituteId": "22010101",
+      "name": "Aarav Sharma",
+      "phone": "9876543210",
+      "email": "aarav.sharma@example.com",
+      "year": 3,
+      "branch": "CSE"
+    }
+  ]
+}
+```
+
+- **Response (201 Created - Individual)**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "6741b0a1e4b01234567890ab",
+    "registrationId": "4819203",
+    "date": "2026-04-15",
+    "eventName": "IEEE Web Development Bootcamp 2026",
+    "mode": "INDIVIDUAL",
+    "teamName": null,
+    "members": [
+      {
+        "instituteId": "22010101",
+        "name": "Aarav Sharma",
+        "phone": "9876543210",
+        "email": "aarav.sharma@example.com",
+        "year": 3,
+        "branch": "CSE"
+      }
+    ],
+    "createdAt": "2026-10-06T16:00:00.000Z",
+    "updatedAt": "2026-10-06T16:00:00.000Z"
+  }
+}
+```
+
+##### Request Example 2: Team Registration
+- **Endpoint**: `POST /api/v1/registration/new?mode=TEAM`
+- **Request Body**:
+```json
+{
+  "eventName": "IEEE Day Hackathon 2026",
+  "date": "2026-04-20",
+  "teamName": "CyberKnights",
+  "members": [
+    {
+      "instituteId": "22010101",
+      "name": "Aarav Sharma",
+      "phone": "9876543210",
+      "email": "aarav.sharma@example.com",
+      "year": 3,
+      "branch": "CSE"
+    },
+    {
+      "instituteId": "22010145",
+      "name": "Priya Verma",
+      "phone": "9876543211",
+      "email": "priya.verma@example.com",
+      "year": 3,
+      "branch": "AIML"
+    }
+  ]
+}
+```
+
+- **Response (201 Created - Team)**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "6741b0a1e4b01234567890ac",
+    "registrationId": "7392814",
+    "date": "2026-04-20",
+    "eventName": "IEEE Day Hackathon 2026",
+    "mode": "TEAM",
+    "teamName": "CyberKnights",
+    "members": [
+      {
+        "instituteId": "22010101",
+        "name": "Aarav Sharma",
+        "phone": "9876543210",
+        "email": "aarav.sharma@example.com",
+        "year": 3,
+        "branch": "CSE"
+      },
+      {
+        "instituteId": "22010145",
+        "name": "Priya Verma",
+        "phone": "9876543211",
+        "email": "priya.verma@example.com",
+        "year": 3,
+        "branch": "AIML"
+      }
+    ],
+    "createdAt": "2026-10-06T16:05:00.000Z",
+    "updatedAt": "2026-10-06T16:05:00.000Z"
+  }
+}
+```
+
+- **Side Effect (Automated Certificate Provisioning)**:
+  For each participant in `members`, a record is automatically inserted into the `certificate` collection with:
+  ```json
+  {
+    "name": "<member.name>",
+    "email": "<member.email>",
+    "branch": "<member.branch>",
+    "eventName": "<eventName>",
+    "date": "<date>",
+    "certificateId": "<generated_unique_certificate_id>",
+    "position": null,
+    "status": "pending"
+  }
+  ```
+
+- **Error Responses**:
+  - `400 Bad Request` (Missing required fields):
+    ```json
+    {
+      "success": false,
+      "message": "Event name is required"
+    }
+    ```
+  - `400 Bad Request` (Invalid mode):
+    ```json
+    {
+      "success": false,
+      "message": "Invalid mode. Mode must be INDIVIDUAL or TEAM"
+    }
+    ```
+  - `400 Bad Request` (Individual member count mismatch):
+    ```json
+    {
+      "success": false,
+      "message": "Individual registration can have only one member"
+    }
+    ```
+  - `400 Bad Request` (Team name with individual registration):
+    ```json
+    {
+      "success": false,
+      "message": "Team name is not allowed for individual registration"
+    }
+    ```
+  - `400 Bad Request` (Team size less than 2):
+    ```json
+    {
+      "success": false,
+      "message": "Team registration must have at least two members"
+    }
+    ```
+  - `400 Bad Request` (Missing team name):
+    ```json
+    {
+      "success": false,
+      "message": "Team name is required for team registration"
+    }
+    ```
+  - `400 Bad Request` (Missing member fields):
+    ```json
+    {
+      "success": false,
+      "message": "All member fields are required: instituteId, name, phone, email, year and branch"
+    }
+    ```
+  - `409 Conflict` (Duplicate team name for event):
+    ```json
+    {
+      "success": false,
+      "message": "This team name is already registered for this event"
+    }
+    ```
+  - `500 Internal Server Error`:
+    ```json
+    {
+      "success": false,
+      "message": "Unable to generate a unique registration ID. Please try again."
+    }
+    ```
+
+---
+
+#### `GET /api/v1/registration/getInfo/:registrationId`
+Retrieves registration details for a specific individual or team using their unique 7-digit `registrationId`.
+
+- **Authentication**: None (Public)
+- **Headers**: None
+- **URL Parameters**:
+  - `registrationId` *(string, required)*: The 7-digit registration ID generated during registration (e.g. `4819203`).
+- **Response (200 OK)**:
+```json
+{
+  "success": true,
+  "data": {
+    "_id": "6741b0a1e4b01234567890ab",
+    "registrationId": "4819203",
+    "date": "2026-04-15",
+    "eventName": "IEEE Web Development Bootcamp 2026",
+    "mode": "INDIVIDUAL",
+    "teamName": null,
+    "members": [
+      {
+        "instituteId": "22010101",
+        "name": "Aarav Sharma",
+        "phone": "9876543210",
+        "email": "aarav.sharma@example.com",
+        "year": 3,
+        "branch": "CSE"
+      }
+    ],
+    "createdAt": "2026-10-06T16:00:00.000Z",
+    "updatedAt": "2026-10-06T16:00:00.000Z"
+  }
+}
+```
+- **Response (404 Not Found)**:
+```json
+{
+  "success": false,
+  "message": "Registration not found"
+}
+```
+- **Response (400 Bad Request)**:
+```json
+{
+  "success": false,
+  "message": "Registration ID is required"
+}
+```
+
+---
+
+#### `GET /api/v1/registration/getAll`
+Retrieves a complete list of all event registrations, sorted in descending order of registration date (`createdAt: -1`).
+
+- **Authentication**: None (Public)
+- **Headers**: None
+- **Response (200 OK)**:
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "_id": "6741b0a1e4b01234567890ac",
+      "registrationId": "7392814",
+      "date": "2026-04-20",
+      "eventName": "IEEE Day Hackathon 2026",
+      "mode": "TEAM",
+      "teamName": "CyberKnights",
+      "members": [
+        {
+          "instituteId": "22010101",
+          "name": "Aarav Sharma",
+          "phone": "9876543210",
+          "email": "aarav.sharma@example.com",
+          "year": 3,
+          "branch": "CSE"
+        },
+        {
+          "instituteId": "22010145",
+          "name": "Priya Verma",
+          "phone": "9876543211",
+          "email": "priya.verma@example.com",
+          "year": 3,
+          "branch": "AIML"
+        }
+      ],
+      "createdAt": "2026-10-06T16:05:00.000Z",
+      "updatedAt": "2026-10-06T16:05:00.000Z"
+    },
+    {
+      "_id": "6741b0a1e4b01234567890ab",
+      "registrationId": "4819203",
+      "date": "2026-04-15",
+      "eventName": "IEEE Web Development Bootcamp 2026",
+      "mode": "INDIVIDUAL",
+      "teamName": null,
+      "members": [
+        {
+          "instituteId": "22010101",
+          "name": "Aarav Sharma",
+          "phone": "9876543210",
+          "email": "aarav.sharma@example.com",
+          "year": 3,
+          "branch": "CSE"
+        }
+      ],
+      "createdAt": "2026-10-06T16:00:00.000Z",
+      "updatedAt": "2026-10-06T16:00:00.000Z"
+    }
+  ]
+}
+```
+

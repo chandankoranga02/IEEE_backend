@@ -32,6 +32,11 @@ It provides automated digital certificate generation and email dispatching, medi
 - **Department & Event Publications**:
   - Department-specific activity logging categorized by branch (`CSE`, `AIML`, `EE`, `ECE`, `BT`).
   - Upcoming events tracking with registration deadlines and overview details.
+- **Event Registration Management**:
+  - Participant and team registrations for IEEE events (`INDIVIDUAL` or `TEAM` mode).
+  - Automated collision-checked 7-digit registration ID generation.
+  - Automatic creation of linked pending certificate records for all registered members.
+  - Team name uniqueness verification per event and member count enforcement.
 - **Support & Ticket Resolution**:
   - Public contact submission generating unique alphanumeric ticket IDs (`TKT...`).
   - Admin management for reviewing, rejecting, or closing/solving tickets.
@@ -74,12 +79,14 @@ IEEE_backend/
 │   │   └── ratelimiter.js           # Rate limiter configurations (Login protection)
 │   ├── models/                      # Mongoose database schemas & models
 │   │   ├── DepartmentPost.js        # Departmental post schema
+│   │   ├── Registration.js          # Event registration schema (Individual & Team)
 │   │   ├── certificate.js           # Certificate application & issuance schema
 │   │   ├── contactUs.js             # Support tickets schema
 │   │   ├── passwordReset.js         # OTP password reset schema (TTL indexed)
 │   │   ├── upcomingEvents.js        # Upcoming events schema
 │   │   └── user.js                  # Admin user credentials schema
 │   ├── modules/                     # Feature modules (Route -> Controller -> Services)
+│   │   ├── Registration/            # Event registration management (Individual & Team)
 │   │   ├── Support/                 # Support ticket inquiry & management
 │   │   ├── UpcomingEvent/           # Upcoming events publishing
 │   │   ├── auth/                    # Admin login, logout & OTP password recovery
@@ -94,6 +101,7 @@ IEEE_backend/
 │       ├── EventsIDgenerator.js     # Event post ID generator
 │       ├── GeneratePostId.js        # Department post ID generator
 │       ├── OtpGenerator.js          # Cryptographic 6-digit OTP generator
+│       ├── RegistrationIDgenerator.js# 7-digit unique registration ID generator
 │       ├── certificateIDgenerator.js# Unique certificate ID generator
 │       ├── generateCertificatePDF.js# Puppeteer PDF rendering engine
 │       ├── jwt.sign.js              # JWT creation helper
@@ -213,6 +221,22 @@ Manages transient OTP verifications for admin password resets.
 - `attempts` *(Number, default: 0)*: Count of failed entry attempts.
 - **TTL Index**: MongoDB automatically purges documents when `expiresAt` is reached (`expireAfterSeconds: 0`).
 
+### 7. `Registration` (`src/models/Registration.js`)
+Tracks participant and team registrations for IEEE events.
+- `registrationId` *(String, required, unique, index)*: 7-digit unique identifier (e.g. `7481920`).
+- `date` *(String, required)*: Event date string.
+- `eventName` *(String, required, trim)*: Name of the event registered for.
+- `mode` *(String, required, enum: `["INDIVIDUAL", "TEAM"]`)*: Registration mode.
+- `teamName` *(String, trim, default: null)*: Name of the team (required for `TEAM`, `null` for `INDIVIDUAL`).
+- `members` *(Array of Member Objects, required)*:
+  - `instituteId` *(String, required, trim)*: Student college ID / roll number.
+  - `name` *(String, required, trim)*: Member's full name.
+  - `phone` *(String, required, trim)*: Member's contact number.
+  - `email` *(String, required, lowercase, trim)*: Member's email address.
+  - `year` *(Number, required, min: 1, max: 4)*: Current academic year.
+  - `branch` *(String, required, trim)*: Engineering branch / department.
+- `timestamps`: `createdAt`, `updatedAt`.
+
 ---
 
 ## ⚙️ Environment Variables
@@ -252,7 +276,8 @@ cp .env.example .env
 | **Upcoming Events**| `/api/v1/upcomingevents`| 5 | CRUD operations for upcoming events with Cloudinary banner upload |
 | **Support** | `/api/v1/support` | 5 | Public inquiry submission & admin ticket management (close/reject/view) |
 | **Dashboard** | `/api/v1/dashboard` | 4 | Aggregated admin analytics for departments, events, tickets & certificates |
-| **Total** | | **30** | |
+| **Registration** | `/api/v1/registration` | 3 | Individual & team event registration, retrieval by ID, and list all registrations |
+| **Total** | | **33** | |
 
 ---
 
