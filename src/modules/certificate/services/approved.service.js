@@ -46,15 +46,18 @@ const approvedService = async (id) => {
     });
 
     pdfBuffer = await generateCertificatePDF(html);
-  } catch (pdfError) {
-    // Rollback status on PDF failure
-    certificate.status = "pending";
-    await certificate.save();
-    console.error("Approved Service – PDF generation failed:", pdfError);
-    const err = new Error("Failed to generate certificate PDF");
-    err.statusCode = 500;
-    throw err;
-  }
+} catch (pdfError) {
+  console.error("========== PDF ERROR ==========");
+  console.error("Error:", pdfError);
+  console.error("Message:", pdfError?.message);
+  console.error("Stack:", pdfError?.stack);
+  console.error("================================");
+
+  certificate.status = "pending";
+  await certificate.save();
+
+  throw pdfError; // temporarily original error throw karo
+}
 
 
   let messageId;
