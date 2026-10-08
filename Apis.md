@@ -7,10 +7,10 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 ## 📊 Summary of APIs
 
 ### 1. Global Metrics
-- **Total APIs Count**: `33`
-- **Total Modules**: `8`
+- **Total APIs Count**: `34`
+- **Total Modules**: `9`
 - **Protected APIs (Require JWT Auth)**: `17`
-- **Public APIs**: `16`
+- **Public APIs**: `17`
 
 ### 2. Module-wise Breakdown
 
@@ -24,7 +24,8 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 | **Support & Tickets** | `/api/v1/support` | 5 | 1 | 4 |
 | **Dashboard Analytics** | `/api/v1/dashboard` | 4 | 0 | 4 |
 | **Registration** | `/api/v1/registration` | 3 | 3 | 0 |
-| **Total** | | **33** | **16** | **17** |
+| **Student Directory** | `/api/v1/directory` | 1 | 1 | 0 |
+| **Total** | | **34** | **17** | **17** |
 
 ---
 
@@ -65,6 +66,7 @@ Comprehensive API documentation for the **IEEE GBPIET Student Branch Backend**.
 | 31 | Registration | `POST` | `/api/v1/registration/new` | No | `application/json` | Participant or team event registration & certificate provisioning |
 | 32 | Registration | `GET` | `/api/v1/registration/getInfo/:registrationId` | No | None | Retrieves registration details by 7-digit `registrationId` |
 | 33 | Registration | `GET` | `/api/v1/registration/getAll` | No | None | Retrieves all event registrations sorted by newest first |
+| 34 | Student Directory | `GET` | `/api/v1/directory/getAll` | No | None | Retrieves all student directory records sorted alphabetically by name |
 
 ---
 
@@ -1291,4 +1293,73 @@ Retrieves a complete list of all event registrations, sorted in descending order
   ]
 }
 ```
+
+---
+
+### 9. Student Directory Module (`/api/v1/directory`)
+
+Manages student directory records and profiles within the institution.
+
+#### `GET /api/v1/directory/getAll`
+Retrieves a complete list of all student directory profiles, sorted in ascending alphabetical order by student name (`name: 1`).
+
+- **Authentication**: None (Public)
+- **Headers**: None
+- **Query Parameters**: None
+- **Request Body**: None
+- **Response (200 OK)**:
+```json
+{
+  "success": true,
+  "count": 2,
+  "data": [
+    {
+      "_id": "6741b123e4b01234567890e1",
+      "instituteId": "22010101",
+      "name": "Aarav Sharma",
+      "branch": "CSE",
+      "year": 3,
+      "batchYear": 2026,
+      "email": "aarav.sharma@example.com",
+      "phone": "9876543210",
+      "gender": "MALE",
+      "createdAt": "2026-10-06T10:00:00.000Z",
+      "updatedAt": "2026-10-06T10:00:00.000Z"
+    },
+    {
+      "_id": "6741b123e4b01234567890e2",
+      "instituteId": "22010145",
+      "name": "Priya Verma",
+      "branch": "AIML",
+      "year": 3,
+      "batchYear": 2026,
+      "email": "priya.verma@example.com",
+      "phone": "9876543211",
+      "gender": "FEMALE",
+      "createdAt": "2026-10-06T10:05:00.000Z",
+      "updatedAt": "2026-10-06T10:05:00.000Z"
+    }
+  ]
+}
+```
+- **Response (500 Internal Server Error)**:
+```json
+{
+  "success": false,
+  "message": "Failed to fetch users"
+}
+```
+- **Field Definitions (`data[]`)**:
+  - `_id` *(ObjectId)*: Unique identifier of the student directory document.
+  - `instituteId` *(string, required)*: Unique institutional student roll/identification number.
+  - `name` *(string, required)*: Full name of the student.
+  - `branch` *(string, required)*: Department/engineering branch (e.g., `CSE`, `AIML`, `ECE`).
+  - `year` *(number, required)*: Current year of study (`1`, `2`, `3`, or `4`).
+  - `batchYear` *(number, required)*: Graduation batch year (e.g., `2026`).
+  - `email` *(string, optional)*: Student contact email address.
+  - `phone` *(string, optional)*: Student contact phone number.
+  - `gender` *(string, optional)*: Gender identifier (`MALE`, `FEMALE`, or `OTHER`).
+  - `createdAt` *(ISO 8601 string)*: Timestamp when the directory entry was created.
+  - `updatedAt` *(ISO 8601 string)*: Timestamp when the directory entry was last updated.
+
 
